@@ -226,6 +226,8 @@ error:
         if (ret != 0) {
             NSLog(@"Unable to mount %@", self.espName);
         } else {
+            CFRelease(self.espProperties);
+            self.espProperties = DADiskCopyDescription(self.espDisk);
             mountPoint = (__bridge NSURL *)CFDictionaryGetValue(self.espProperties, kDADiskDescriptionVolumePathKey);
             NSLog(@"%@ mounted at %@", self.espName, mountPoint);
         }

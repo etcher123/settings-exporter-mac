@@ -61,7 +61,7 @@
     // Export user settings
     NSLog(@"Writing settings to %@", [espMountPoint absoluteString]);
     [contents appendFormat:@"LOCALE=%@.UTF-8\n", self.settings.locale];
-    [contents appendFormat:@"KEYMAP=%@\n", self.settings.linuxKeymap];
+    [contents appendFormat:@"KEYBOARD=%@\n", self.settings.linuxKeymap];
     [contents appendFormat:@"TZ=%@\n", self.settings.timezone];
     ret = [contents writeToURL:settingsfile atomically:true encoding:NSUTF8StringEncoding error:nil];
     if (!ret) {
@@ -73,11 +73,16 @@
     [[NSFileManager defaultManager] createDirectoryAtURL:connections withIntermediateDirectories:true attributes:nil error:nil];
     settingsfile = [connections URLByAppendingPathComponent:[self.settings wifiSSID]];
     [contents setString:@""];
-    [contents appendFormat:@"[connection]\nid=%@\nuuid=%@\ntype=wifi\nautoconnect=true\n\n",
+    [contents appendFormat:@"[connection]\nid=%@\nuuid=%@\ntype=wifi\npermissions=\nautoconnect=true\n\n",
                             self.settings.wifiSSID, [[[NSUUID UUID] UUIDString] lowercaseString]];
     [contents appendFormat:@"[wifi]\nmac-address=%@\nmac-address-blacklist=\nmode=infrastructure\nssid=%@\n\n",
                             self.settings.wifiMAC, self.settings.wifiSSID];
-    [contents appendFormat:@"[wifi-security]\nkey-mgmt=wpa-psk\npsk=%@\n\n", self.settings.wifiPassword];
+    if (self.settings.wifiSecurity != none) {
+        if (self.settings.wifiSecurity == wep)
+            [contents appendFormat:@"[wifi-security]\nkey-mgmt=none\nwep-key0=%@\n\n", self.settings.wifiPassword];
+        else
+            [contents appendFormat:@"[wifi-security]\nkey-mgmt=wpa-psk\npsk=%@\n\n", self.settings.wifiPassword];
+    }
     [contents appendString:@"[ipv4]\ndns-search=\nmethod=auto\n\n"];
     [contents appendString:@"[ipv6]\naddr-gen-mode=stable-privacy\ndns-search=\nip6-privacy=0\nmethod=auto\n"];
     ret = [contents writeToURL:settingsfile atomically:true encoding:NSUTF8StringEncoding error:nil];

@@ -9,12 +9,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SESystemSettings : NSObject
 
+typedef enum {
+    none = 0,
+    wep,
+    wpa
+} WifiSecurity;
+
 @property NSString *macKeymap;
 @property NSString *linuxKeymap;
 @property NSString *locale;
 @property NSString *timezone;
 @property NSString *wifiSSID;
 @property NSString *wifiMAC;
+@property WifiSecurity wifiSecurity;
 @property NSString *wifiPassword;
 
 - (bool)readUserSettings;
