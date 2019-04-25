@@ -116,7 +116,11 @@ error:
 
 - (bool)writeImage:(NSString *)imgFile
 {
-    NSString *devFile = [@"/dev/" stringByAppendingString:self.driveName];
+    /*
+     * Use the "raw" device file, in the form "/dev/rdiskX" instead of
+     * the standard (and much slower) "/dev/diskX"
+     */
+    NSString *devFile = [@"/dev/r" stringByAppendingString:self.driveName];
     NSFileHandle *inFile = [NSFileHandle fileHandleForReadingAtPath:devFile];
     NSFileHandle *outFile = [NSFileHandle fileHandleForReadingAtPath:imgFile];
     NSData *buffer;
