@@ -52,7 +52,19 @@
         if (isRemovable && CFBooleanGetValue(isRemovable)) {
             CFStringRef prop = CFDictionaryGetValue(properties, kDADiskDescriptionDeviceModelKey);
             NSString *deviceName = [NSString stringWithString:(__bridge NSString *)prop];
-            [removableMediaDict setValue:deviceName forKey:bsdName];
+            NSString *mediaPath = (__bridge NSString *)CFDictionaryGetValue(properties, kDADiskDescriptionMediaPathKey);
+
+            /*
+             * Mounted image files are considered removable media by the OS and can
+             * appear in the results, which should be avoided.
+             * We filter them out by requesting to have the 'media path' property starting
+             * with the "IODeviceTree" string (for image files it starts with "IOServices").
+             * We could also use the bus name ("/" for image files) or device protocol
+             * ("Virtual Interface"), but the media path is enough.
+             */
+            if ([mediaPath hasPrefix:@"IODeviceTree"]) {
+                [removableMediaDict setValue:deviceName forKey:bsdName];
+            }
         }
         
         CFRelease(properties);
