@@ -49,17 +49,21 @@
 {
     NSMutableString *contents = [[NSMutableString alloc] init];
     NSURL *espMountPoint = [self.drive mountESP];
-    NSURL *settingsfile = [espMountPoint URLByAppendingPathComponent:@"settings.conf"];
-    NSURL *connections = [espMountPoint URLByAppendingPathComponent:@"network-connections" isDirectory:true];
+    NSURL *settingsDir = [espMountPoint URLByAppendingPathComponent:@"settings" isDirectory:true];
+    NSURL *settingsfile = [settingsDir URLByAppendingPathComponent:@"settings.conf"];
+    NSURL *connections = [settingsDir URLByAppendingPathComponent:@"network-connections" isDirectory:true];
     bool ret = false;
 
     if (!espMountPoint) {
         NSLog(@"No ESP partition mounted");
         return false;
     }
-    
+
+    // Create settings directory
+    NSLog(@"Writing settings to %@", [settingsDir absoluteString]);
+    [[NSFileManager defaultManager] createDirectoryAtURL:settingsDir withIntermediateDirectories:true attributes:nil error:nil];
+
     // Export user settings
-    NSLog(@"Writing settings to %@", [espMountPoint absoluteString]);
     [contents appendFormat:@"LOCALE=%@.UTF-8\n", self.settings.locale];
     [contents appendFormat:@"KEYBOARD=%@\n", self.settings.linuxKeymap];
     [contents appendFormat:@"TZ=%@\n", self.settings.timezone];
