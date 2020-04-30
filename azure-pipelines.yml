@@ -1,6 +1,3 @@
-# Xcode
-# Build, test, and archive an Xcode workspace on macOS.
-# Add steps that install certificates, test, sign, and distribute an app, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
 trigger:
@@ -13,8 +10,10 @@ steps:
 - task: Xcode@5
   inputs:
     actions: 'build'
-    scheme: ''
     sdk: 'macosx'
     configuration: 'Release'
-    xcWorkspacePath: '**/*.xcodeproj/project.xcworkspace'
-    xcodeVersion: 'default' # Options: 8, 9, 10, default, specifyPath
+
+- bash: ln -s /Users/runner/Library/Developer/Xcode/DerivedData/SettingsExporter-* output
+
+- publish: $(System.DefaultWorkingDirectory)/output/Build/Products/Release/SettingsExporter
+  artifact: settings-exporter-mac
